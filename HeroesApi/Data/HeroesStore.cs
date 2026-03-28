@@ -76,4 +76,5 @@ public static class HeroesStore
             InternalNotes = "Разрушает четвёртую стену"
         }
     };
+    
 }

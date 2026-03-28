@@ -12,9 +12,18 @@ public class HeroesController : ControllerBase
 {
 
     [HttpGet]
-    public ActionResult<List<Hero>> GetAll()
+    public ActionResult<List<Hero>> GetAll([FromQuery] string? universe = null)
     {
-        return Ok(HeroesStore.Heroes);
+        if (string.IsNullOrEmpty(universe))
+        {
+            return Ok(HeroesStore.Heroes);
+        }
+        
+        var filtered = HeroesStore.Heroes
+            .Where(h => h.Universe.ToString() == universe)
+            .ToList();
+        
+        return Ok(filtered);
     }
 
     [HttpGet("{id}")]
@@ -88,5 +97,19 @@ public class HeroesController : ControllerBase
             deserializedObject = deserialized,
             internalNotesAfterDeserialize = deserialized?.InternalNotes
         });
+    }
+    [HttpGet("search")]
+    public ActionResult<List<Hero>> Search([FromQuery] string? name = null)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return BadRequest(new { message = "Параметр name обязателен" });
+        }
+        
+        var found = HeroesStore.Heroes
+            .Where(h => h.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        
+        return Ok(found);
     }
 }
